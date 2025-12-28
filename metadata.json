@@ -1,0 +1,9 @@
+{
+  "name": "CodeWorld: Aprende Programación",
+  "description": "Una aventura interactiva para aprender a programar, estilo RPG. Supera niveles, gana certificados y utiliza herramientas de IA avanzadas.",
+  "requestFramePermissions": [
+    "microphone",
+    "camera",
+    "geolocation"
+  ]
+}
