@@ -1,10 +1,9 @@
-
 import { GoogleGenAI, Type, Modality } from "@google/genai";
 import { LessonContent, CourseLevel } from "../types";
 
 // Helper to get client with current key
 const getClient = () => {
-  return new GoogleGenAI({ apiKey: "AIzaSyCZzOrruDL2uLNa3xnzJKPH5RLTEDo7_-U" });
+  return new GoogleGenAI({ apiKey: process.env.API_KEY });
 };
 
 // --- Helpers ---

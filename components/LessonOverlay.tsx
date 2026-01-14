@@ -142,7 +142,7 @@ export const LessonOverlay: React.FC<LessonProps> = ({ level, language, onComple
                 <div className="space-y-4 mb-8">
                      <div 
                         className="text-slate-300 text-sm leading-relaxed instruction-content"
-                        dangerouslySetInnerHTML={{ __html: content?.theory?.replace(/\n/g, '<br/>') || '' }} 
+                        dangerouslySetInnerHTML={{ __html: content?.theory || '' }} 
                      />
                      <button onClick={playAudio} className="flex items-center gap-2 text-xs text-blue-400 hover:text-blue-300 mt-2 transition-colors">
                         <Volume2 className="w-4 h-4" /> Escuchar explicación
