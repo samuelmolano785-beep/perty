@@ -1,3 +1,4 @@
+
 export type AppState = 'onboarding' | 'map' | 'lesson' | 'tools' | 'certificate';
 
 export interface UserProgress {
@@ -5,6 +6,9 @@ export interface UserProgress {
   xp: number;
   hearts: number;
   streak: number;
+  lastLoginDate?: string;
+  motivation?: string;
+  dailyGoal?: number; // minutes
   unlockedCertificates: ('basic' | 'expert')[];
 }
 

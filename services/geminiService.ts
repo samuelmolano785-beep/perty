@@ -1,9 +1,10 @@
+
 import { GoogleGenAI, Type, Modality } from "@google/genai";
 import { LessonContent, CourseLevel } from "../types";
 
 // Helper to get client with current key
 const getClient = () => {
-  return new GoogleGenAI({ apiKey: process.env.API_KEY });
+  return new GoogleGenAI({ apiKey: "AIzaSyCZzOrruDL2uLNa3xnzJKPH5RLTEDo7_-U" });
 };
 
 // --- Helpers ---
@@ -57,26 +58,26 @@ function createWavBlob(pcmData: Uint8Array, sampleRate: number = 24000): Blob {
 export const generateSyllabus = async (language: string): Promise<CourseLevel[]> => {
   // Static syllabus structure for instant loading.
   const syllabusStructure = [
-    { title: "Introducción y Sintaxis", description: "Conceptos básicos", type: 'concept' },
-    { title: "Variables y Tipos", description: "Almacenando información", type: 'concept' },
-    { title: "Operadores Básicos", description: "Matemáticas simples", type: 'challenge' },
-    { title: "Condicionales If/Else", description: "Toma de decisiones", type: 'concept' },
-    { title: "Bucles For y While", description: "Repetición de código", type: 'concept' },
-    { title: "Desafío de Lógica", description: "Prueba tus conocimientos", type: 'challenge' },
-    { title: "Funciones", description: "Código reutilizable", type: 'concept' },
-    { title: "Arrays y Listas", description: "Colecciones de datos", type: 'concept' },
-    { title: "Checkpoint: Novato", description: "Examen Nivel Básico", type: 'checkpoint_basic' }, // Level 9
-    { title: "Diccionarios/Objetos", description: "Estructuras clave-valor", type: 'concept' },
-    { title: "Manipulación de Texto", description: "Trabajando con Strings", type: 'concept' },
-    { title: "Desafío de Algoritmos", description: "Resolución de problemas", type: 'challenge' },
-    { title: "Funciones Avanzadas", description: "Scope y Closures", type: 'concept' },
-    { title: "Programación Orientada a Objetos", description: "Clases e Instancias", type: 'concept' },
-    { title: "Herencia", description: "Extendiendo clases", type: 'concept' },
-    { title: "Manejo de Errores", description: "Try / Catch", type: 'concept' },
-    { title: "Módulos y Librerías", description: "Importando código", type: 'concept' },
-    { title: "Asincronía", description: "Promesas y Async/Await", type: 'concept' },
+    { title: "Estructura Básica", description: "Esqueleto del código", type: 'concept' },
+    { title: "Etiquetas de Texto", description: "Párrafos y Títulos", type: 'concept' },
+    { title: "Listas y Elementos", description: "Organizando datos", type: 'challenge' },
+    { title: "Enlaces e Imágenes", description: "Conectando recursos", type: 'concept' },
+    { title: "Contenedores Div", description: "Agrupando elementos", type: 'concept' },
+    { title: "Desafío de Estructura", description: "Prueba de maquetación", type: 'challenge' },
+    { title: "Estilos Básicos", description: "Introducción a CSS", type: 'concept' },
+    { title: "Colores y Fondos", description: "Dando vida visual", type: 'concept' },
+    { title: "Checkpoint: Novato", description: "Examen Nivel Básico", type: 'checkpoint_basic' }, 
+    { title: "Formularios", description: "Inputs y Botones", type: 'concept' },
+    { title: "Tablas de Datos", description: "Filas y Columnas", type: 'concept' },
+    { title: "Desafío de Interacción", description: "Creando una interfaz", type: 'challenge' },
+    { title: "Variables (JS/Py)", description: "Guardando valores", type: 'concept' },
+    { title: "Funciones Simples", description: "Reutilizando lógica", type: 'concept' },
+    { title: "Condicionales", description: "Tomando decisiones", type: 'concept' },
+    { title: "Bucles", description: "Repitiendo tareas", type: 'concept' },
+    { title: "Arrays / Listas", description: "Colecciones", type: 'concept' },
+    { title: "Eventos", description: "Clics y Teclas", type: 'concept' },
     { title: "Proyecto Final", description: "Aplicación completa", type: 'challenge' },
-    { title: "Checkpoint: Experto", description: "Examen Final", type: 'checkpoint_expert' } // Level 20
+    { title: "Checkpoint: Experto", description: "Examen Final", type: 'checkpoint_expert' }
   ];
 
   return syllabusStructure.map((item, index) => ({
@@ -93,21 +94,32 @@ export const generateLesson = async (language: string, level: CourseLevel): Prom
   const ai = getClient();
   const isCoding = level.type === 'challenge' || level.type.includes('checkpoint') || level.type === 'concept';
   
-  const prompt = `Actúa como un profesor de programación para niños o principiantes absolutos. 
-  Tu objetivo es generar una lección de ${language} sobre "${level.title}".
+  // Prompt diseñado para emular el estilo de la captura de pantalla: Explicaciones ricas, ejemplos visuales y contexto de código claro.
+  const prompt = `Actúa como un diseñador de cursos estilo Duolingo/Codecademy. 
+  Genera una lección de ${language} sobre "${level.title}".
   
-  REGLAS DE ESTILO (CRUCIAL):
-  1. LENGUAJE: Usa español neutro, extremadamente simple y amigable. Cero tecnicismos sin explicación.
-  2. ANALOGÍAS: Usa ejemplos de la vida real (ej: "Una variable es como una cajita con nombre", "Un bucle es como dar vueltas a la manzana").
-  3. PREGUNTA DEL DESAFÍO: Debe ser una frase corta, imperativa y fácil de entender. NO uses "Implementar un algoritmo que...". USA: "Haz que la computadora diga Hola", "Calcula cuánto es 2 + 2".
+  OBJETIVO: Que el usuario entienda CONCEPTUALMENTE y luego practique.
+
+  FORMATO DE RESPUESTA JSON REQUERIDO:
+  1. theory: Explicación detallada pero amigable (Español). 
+     - REGLA: Usa etiquetas HTML para formato.
+     - Usa <code class="bg-gray-800 text-yellow-300 px-1 rounded">codigo</code> para resaltar palabras clave inline.
+     - Incluye SIEMPRE un bloque de ejemplo de código dentro de la teoría envuelto en <pre class="bg-gray-900 text-gray-100 p-3 rounded-md text-sm my-2 border-l-4 border-green-500"><code>...</code></pre>.
+     - Explica qué hace cada parte del ejemplo.
+     - Divide el texto en párrafos cortos <p class="mb-2">...</p>.
+
+  2. question: Una instrucción corta y directa para el ejercicio práctico. (Ej: "Añade una etiqueta H1 dentro del body").
+
+  3. initialCode: El código base que aparecerá en el editor.
+     - IMPORTANTE: No des el editor vacío. Da el "esqueleto" (boilerplate).
+     - Si es HTML, pon <!DOCTYPE html><html><body> ... </body></html>.
+     - Deja un comentario claro donde el usuario debe escribir: <!-- ESCRIBE TU CÓDIGO AQUÍ --> o # ESCRIBE AQUÍ.
   
-  Estructura de salida JSON:
-  1. Theory: La explicación simple con analogías. Usa <b>negrita</b> para palabras clave y <code class="bg-[#333] px-1 rounded text-orange-300">codigo</code> para sintaxis.
-  2. Question: La frase del desafío (corta y clara).
-  3. Type: "${isCoding ? 'coding' : 'multiple_choice'}"
-  4. Options: Array de 4 opciones simples (si es multiple_choice).
-  5. CorrectAnswer: La opción correcta.
-  6. InitialCode: Código inicial para ayudar al usuario.`;
+  4. type: "${isCoding ? 'coding' : 'multiple_choice'}"
+  5. options: (Array strings) Solo si es multiple_choice.
+  6. correctAnswer: (String) Solo si es multiple_choice.
+  
+  Nivel: Principiante Absoluto. Tono: Motivador.`;
 
   const response = await ai.models.generateContent({
     model: 'gemini-3-flash-preview',
@@ -133,22 +145,19 @@ export const generateLesson = async (language: string, level: CourseLevel): Prom
 
 export const checkCodeAnswer = async (language: string, question: string, code: string): Promise<{ passed: boolean; feedback: string; output: string; errorLine?: number }> => {
   const ai = getClient();
-  const prompt = `Eres un tutor amable de programación. El estudiante envió código en ${language}.
-  Misión: "${question}". 
-  Código: \`${code}\`.
+  const prompt = `Eres un validador de código estricto pero amable.
+  Lenguaje: ${language}.
+  Misión del alumno: "${question}". 
+  Código entregado: \`${code}\`.
   
-  Analízalo.
+  Analiza si el código CUMPLE la misión.
   
-  REGLAS DE FEEDBACK:
-  - Si falla: Explica el error como si fueras un amigo, usando lenguaje natural y nada intimidante. Di exactamente qué cambiar de forma sencilla.
-  - Si acierta: Felicítalo con entusiasmo ("¡Genial!", "¡Lo lograste!").
-  - Output: Simula lo que saldría en la consola.
-  
-  Return JSON: { 
-    passed: boolean, 
-    feedback: string, 
-    output: string,
-    errorLine: number
+  JSON de Salida:
+  { 
+    "passed": boolean (true si funciona y cumple la misión), 
+    "feedback": string (Si falla, di por qué en Español simple. Si pasa, di algo positivo y breve), 
+    "output": string (Simula la salida de consola o renderizado texto),
+    "errorLine": number (Linea aproximada del error, o 0)
   }`;
 
   const response = await ai.models.generateContent({
@@ -295,10 +304,13 @@ export const transcribeAudio = async (audioBase64: string) => {
 }
 
 export const textToSpeech = async (text: string) => {
+    // Strip HTML tags for clean speech
+    const cleanText = text.replace(/<[^>]*>/g, '');
+    
     const ai = getClient();
     const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash-preview-tts',
-        contents: { parts: [{ text }] },
+        contents: { parts: [{ text: cleanText }] },
         config: {
             responseModalities: [Modality.AUDIO],
             speechConfig: {

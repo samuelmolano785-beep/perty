@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Onboarding } from './components/Onboarding';
 import { WorldMap } from './components/WorldMap';
@@ -11,20 +12,47 @@ import { Loader2 } from 'lucide-react';
 const App: React.FC = () => {
   const [appState, setAppState] = useState<AppState>('onboarding');
   const [userLanguage, setUserLanguage] = useState<string | null>(null);
-  const [progress, setProgress] = useState<UserProgress>({
-    currentLevelId: 1,
-    xp: 0,
-    hearts: 5,
-    streak: 1,
-    unlockedCertificates: []
+  
+  // Progress State initialized with localStorage check for streak
+  const [progress, setProgress] = useState<UserProgress>(() => {
+     const savedStreak = localStorage.getItem('cw_streak') || '0';
+     const lastLogin = localStorage.getItem('cw_last_login') || '';
+     const today = new Date().toDateString();
+     
+     let currentStreak = parseInt(savedStreak);
+
+     if (lastLogin !== today) {
+         // Determine if consecutive
+         const yesterday = new Date();
+         yesterday.setDate(yesterday.getDate() - 1);
+         
+         if (lastLogin === yesterday.toDateString()) {
+             currentStreak += 1;
+         } else if (lastLogin && lastLogin !== today) {
+             // Missed a day (unless it's first login ever)
+             currentStreak = 1; 
+         } else if (!lastLogin) {
+             currentStreak = 1;
+         }
+         localStorage.setItem('cw_last_login', today);
+         localStorage.setItem('cw_streak', currentStreak.toString());
+     }
+
+     return {
+        currentLevelId: 1,
+        xp: 0,
+        hearts: 5,
+        streak: currentStreak,
+        unlockedCertificates: []
+     };
   });
+
   const [activeLevel, setActiveLevel] = useState<CourseLevel | null>(null);
   const [apiKeyReady, setApiKeyReady] = useState(false);
 
   // Initialize API Key
   useEffect(() => {
     const initKey = async () => {
-      // Cast window to any to access aistudio which might be injected by the environment
       const win = window as any;
       if (win.aistudio) {
         const hasKey = await win.aistudio.hasSelectedApiKey();
@@ -33,15 +61,19 @@ const App: React.FC = () => {
         }
         setApiKeyReady(true);
       } else {
-        // Fallback for dev environments without the wrapper
         setApiKeyReady(true);
       }
     };
     initKey();
   }, []);
 
-  const handleLanguageSelect = (lang: string) => {
-    setUserLanguage(lang);
+  const handleOnboardingComplete = (data: { language: string; motivation: string; goal: number }) => {
+    setUserLanguage(data.language);
+    setProgress(prev => ({
+        ...prev,
+        motivation: data.motivation,
+        dailyGoal: data.goal
+    }));
     setAppState('map');
   };
 
@@ -83,7 +115,7 @@ const App: React.FC = () => {
   return (
     <div className="flex h-full w-full bg-slate-100 overflow-hidden relative">
       {appState === 'onboarding' && (
-        <Onboarding onSelectLanguage={handleLanguageSelect} />
+        <Onboarding onComplete={handleOnboardingComplete} />
       )}
 
       {appState !== 'onboarding' && (
