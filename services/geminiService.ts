@@ -3,7 +3,7 @@ import { LessonContent, CourseLevel } from "../types";
 
 // Helper to get client with current key
 const getClient = () => {
-  return new GoogleGenAI({ apiKey: process.env.API_KEY });
+  return new GoogleGenAI({ apiKey: "AIzaSyCZzOrruDL2uLNa3xnzJKPH5RLTEDo7_-U" });
 };
 
 // --- Helpers ---
